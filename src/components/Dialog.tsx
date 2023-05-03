@@ -29,17 +29,29 @@ const Placeholder = styled.span`
   padding: 0px 30px;
 `;
 
-const Recent = styled.span`
+const SearchResult = styled.span`
   font-size: 1rem;
   padding: 10px 30px;
-  font-weight: bold;
+  font-weight: 500;
+  :hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const Keyword = styled.span`
+  font-weight: 900;
+`;
+
+const Recent = styled(SearchResult)`
+  font-size: 1rem;
+  padding: 10px 30px;
+  font-weight: 900;
   :hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
 `;
 
 const NoSearch = styled(Recent)``;
-const SearchResult = styled(Recent)``;
 
 export default function Dialog({ recomendtList, keyword, focus }: DialogType) {
   const recentSearch = JSON.parse(sessionStorage.getItem('recent-search') as string);
@@ -54,7 +66,12 @@ export default function Dialog({ recomendtList, keyword, focus }: DialogType) {
         <Recent>{keyword}</Recent>
         {recomendtList && <Placeholder>추천 검색어</Placeholder>}
         {recomendtList?.map((recomend: RecomendType) => {
-          return <SearchResult key={recomend.id}>{recomend.name}</SearchResult>;
+          return (
+            <SearchResult key={recomend.id}>
+              <Keyword>{keyword}</Keyword>
+              {recomend.name.replace(keyword, '')}
+            </SearchResult>
+          );
         })}
       </Container>
     );
