@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { AxiosResponse } from 'axios';
 import useDebounce from '../hooks/useDebounce.ts';
-import getSearchResult from '../Instance/getSearchWordsAPI.ts';
 import useCache from '../hooks/useCache.ts';
 import Dialog from '../components/Dialog.tsx';
 
@@ -52,29 +51,24 @@ export interface RecomendType {
 
 export default function Home() {
   // const [initialRecomend] = useState(() => getDefaultRecomend());
-  const [recomend, setRecomend] = useState<RecomendType[] | AxiosResponse | null>();
-  const modalRef = useRef<HTMLDialogElement>(null);
+  const [recomend, setRecomend] = useState<RecomendType[] | null>();
   const debounce = useDebounce({ delay: 1000 });
-  const getCachedData = useCache();
+  const getCahceData = useCache();
 
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchRecomendWords = await debounce({
-      callback: getCachedData,
-      url: `?name=${e.target.value}`,
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchWords = await debounce({
+      callback: getCahceData,
+      url: `${e.target.value}`,
     });
 
-    if (searchRecomendWords?.length !== 0) setRecomend(searchRecomendWords);
-  };
-
-  const handleDialog = () => {
-    modalRef.current?.showModal();
+    if (searchWords && searchWords?.length !== 0) setRecomend(searchWords);
   };
 
   return (
     <Container>
       <Background>
         <div>
-          <SearchBar onChange={handleSearch} onClick={handleDialog} onFocus={handleDialog} />
+          <SearchBar onChange={handleSearchChange} />
           <Dialog recomendtList={recomend as RecomendType[]} />
         </div>
       </Background>

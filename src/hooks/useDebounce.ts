@@ -1,15 +1,15 @@
 import { AxiosResponse } from 'axios';
 import { RecomendType } from '../pages/Home.tsx';
 
-interface DebounceType<T> {
-  callback: (url: string) => Promise<AxiosResponse<T> | T[] | null>;
+interface DebounceType {
+  callback: (url: string) => Promise<RecomendType[] | null>;
   url: string;
 }
 
 export default function useDebounce({ delay }: { delay: number }) {
   let timer: number;
 
-  return ({ callback, url }: DebounceType<RecomendType>) => {
+  return ({ callback, url }: DebounceType): Promise<RecomendType[] | null> => {
     clearTimeout(timer);
 
     return new Promise(resolve => {

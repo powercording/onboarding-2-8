@@ -18,25 +18,25 @@ const getSearchResult = axios.create({
 });
 
 getSearchResult.interceptors.response.use((response: AxiosResponse) => {
-  if (response.status === 200) {
-    const url = new URLSearchParams(response.config.url as string);
-    const key = url.get(CONST.PARAMETER) as string;
+  if (response.status !== 200) {
+    throw new Error(CONST.ERROR);
+  }
+  if (response.data.length === 0) {
+    return console.info(CONST.INVALID);
+  }
 
-    if (response.data.length !== 0) {
-      sessionStorage.setItem(
-        key,
-        JSON.stringify({
-          value: response.data,
-          expiresAt: Date.now() + CONST.SEC * CONST.MIN * 10,
-        }),
-      );
-    }
-    return response.data;
-  }
-  if (response.status === 400) {
-    console.info(CONST.INVALID);
-  }
-  throw new Error(CONST.ERROR);
+  const url = new URLSearchParams(response.config.url as string);
+  const key = url.get(CONST.PARAMETER) as string;
+
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({
+      value: response.data,
+      expiresAt: Date.now() + CONST.SEC * CONST.MIN * 10,
+    }),
+  );
+
+  return response.data;
 });
 
 export default getSearchResult;

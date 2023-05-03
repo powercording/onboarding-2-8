@@ -9,9 +9,8 @@ export interface searchResultCacheType {
 let calledTime = 0;
 
 export default function useCache() {
-  const getData = async (url: string) => {
-    const key = new URLSearchParams(url).get('name') as string;
-    const cacheData: searchResultCacheType = JSON.parse(sessionStorage.getItem(key) as string);
+  const getData = async (url: string): Promise<RecomendType[] | null> => {
+    const cacheData: searchResultCacheType = JSON.parse(sessionStorage.getItem(url) as string);
 
     if (cacheData && cacheData.expiresAt > Date.now()) {
       return cacheData.value;
@@ -19,9 +18,8 @@ export default function useCache() {
 
     if (!cacheData) {
       calledTime += 1;
-      console.log('api 호출', calledTime);
-      const fetchResult = await getSearchWordApi.get(url);
-      return fetchResult;
+      console.info('api 호출', calledTime);
+      return getSearchWordApi.get(`?name=${url}`);
     }
 
     return null;
