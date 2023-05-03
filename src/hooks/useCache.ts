@@ -16,9 +16,13 @@ export default function useCache() {
       return cacheData.value;
     }
 
+    if (!url) {
+      return null;
+    }
+
     if (!cacheData) {
       calledTime += 1;
-      console.info('api 호출', calledTime);
+      console.info('calling api', calledTime);
       return getSearchWordApi.get(`?name=${url}`);
     }
 

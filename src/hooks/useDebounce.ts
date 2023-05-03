@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios';
+import { useState } from 'react';
 import { RecomendType } from '../pages/Home.tsx';
 
 interface DebounceType {
@@ -7,19 +7,21 @@ interface DebounceType {
 }
 
 export default function useDebounce({ delay }: { delay: number }) {
-  let timer: number;
+  const [timer, setTimer] = useState<number | undefined>();
 
   return ({ callback, url }: DebounceType): Promise<RecomendType[] | null> => {
     clearTimeout(timer);
 
     return new Promise(resolve => {
-      timer = setTimeout(() => {
-        try {
-          resolve(callback(url));
-        } catch (e) {
-          console.error(e);
-        }
-      }, delay);
+      setTimer(
+        setTimeout(() => {
+          try {
+            resolve(callback(url));
+          } catch (e) {
+            console.error(e);
+          }
+        }, delay),
+      );
     });
   };
 }
