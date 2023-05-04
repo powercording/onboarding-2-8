@@ -4,6 +4,8 @@ import useDebounce from '../hooks/useDebounce.ts';
 import useCache from '../hooks/useCache.ts';
 import Dialog from '../components/Dialog.tsx';
 import Icon, { MiniIcon } from '../assets/Icon.tsx';
+import Suggession from '../components/suggession/Sugession.tsx';
+import HeadLine from '../components/HeadLine/HeadLine.tsx';
 
 const Container = styled.div`
   width: 100dvw;
@@ -42,13 +44,14 @@ export interface RecomendType {
 
 export default function Home() {
   const [recomend, setRecomend] = useState<RecomendType[] | null>();
+  const [keyIndex, setKeyIndex] = useState(-1);
   const [focus, setFocus] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounce = useDebounce({ delay: 600 });
   const getCahceData = useCache();
 
   const handleInputFocus = () => {
-    setFocus(prev => !prev);
+    setFocus(true);
   };
 
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +62,7 @@ export default function Home() {
     setRecomend(() => searchWords);
   };
 
-  const handleEnter = () => {
+  const handleSearch = () => {
     const recentItem = JSON.parse(sessionStorage.getItem('recent-search') as string);
     if (!recentItem) {
       sessionStorage.setItem('recent-search', JSON.stringify([inputRef.current?.value]));
@@ -72,22 +75,38 @@ export default function Home() {
     }
   };
 
+  const handleArrowUp = () => {
+    if (recomend && keyIndex > 0) {
+      setKeyIndex(prev => prev - 1);
+    }
+  };
+
+  const handleArrowDown = () => {
+    if (recomend && keyIndex < recomend.length - 1) {
+      setKeyIndex(prev => prev + 1);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleEnter();
+    switch (e.key) {
+      case 'Enter':
+        handleSearch();
+        break;
+      case 'ArrowUp':
+        handleArrowUp();
+        break;
+      case 'ArrowDown':
+        handleArrowDown();
+        break;
+      default:
+        break;
     }
   };
 
   return (
     <Container>
       <Background>
-        <div>
-          <h1>
-            국내 모든 임상 검색하고
-            <br />
-            온라인으로 참여하기
-          </h1>
-        </div>
+        <HeadLine />
         <div style={{ position: 'relative' }}>
           <MiniIcon />
           <SearchBar
@@ -95,14 +114,20 @@ export default function Home() {
             onChange={handleSearchChange}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
-            onBlur={handleInputFocus}
+            // onClick={handleInputFocus}
           />
           <Icon />
-          <Dialog
-            recomendtList={recomend as RecomendType[]}
-            keyword={`${inputRef.current?.value}`}
-            focus={focus}
-          />
+          <Dialog keyword={`${inputRef.current?.value}`} focus={focus}>
+            {recomend?.map((list: RecomendType, index) => (
+              <Suggession
+                key={list.id}
+                keyIndex={keyIndex}
+                index={index}
+                name={list.name}
+                keyword={`${inputRef.current?.value}`}
+              />
+            ))}
+          </Dialog>
         </div>
       </Background>
     </Container>

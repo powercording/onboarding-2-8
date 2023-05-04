@@ -1,12 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { RecomendType } from '../pages/Home.tsx';
-
-interface DialogType {
-  recomendtList: RecomendType[];
-  keyword: string;
-  focus: boolean;
-}
 
 const Container = styled.div`
   background-color: white;
@@ -38,10 +31,6 @@ const SearchResult = styled.span`
   }
 `;
 
-const Keyword = styled.span`
-  font-weight: 900;
-`;
-
 const Recent = styled(SearchResult)`
   font-size: 1rem;
   padding: 10px 30px;
@@ -51,10 +40,22 @@ const Recent = styled(SearchResult)`
   }
 `;
 
-const NoSearch = styled(Recent)``;
+const NoSearch = styled(Recent)`
+  :hover {
+    background-color: transparent;
+  }
+`;
 
-export default function Dialog({ recomendtList, keyword, focus }: DialogType) {
+interface DialogType {
+  keyword: string;
+  focus: boolean;
+  children: React.ReactNode;
+}
+
+export default function Dialog({ keyword, focus, children }: DialogType) {
   const recentSearch = JSON.parse(sessionStorage.getItem('recent-search') as string);
+
+  // useEffect
 
   if (!focus) {
     return null;
@@ -64,15 +65,8 @@ export default function Dialog({ recomendtList, keyword, focus }: DialogType) {
     return (
       <Container>
         <Recent>{keyword}</Recent>
-        {recomendtList && <Placeholder>추천 검색어</Placeholder>}
-        {recomendtList?.map((recomend: RecomendType) => {
-          return (
-            <SearchResult key={recomend.id}>
-              <Keyword>{keyword}</Keyword>
-              {recomend.name.replace(keyword, '')}
-            </SearchResult>
-          );
-        })}
+        {children && <Placeholder>추천 검색어</Placeholder>}
+        {children}
       </Container>
     );
   }
