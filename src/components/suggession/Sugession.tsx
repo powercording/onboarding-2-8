@@ -13,6 +13,7 @@ const SearchResult = styled.span`
 const SelectRsult = styled(SearchResult)`
   background-color: rgba(0, 0, 0, 0.1);
 `;
+
 interface SuggetionType {
   name: string;
   keyword: string;
